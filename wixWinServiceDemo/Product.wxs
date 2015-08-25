@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="*" Name="wixWinServiceDemo" Language="1033" Version="1.0.0.0" Manufacturer="Microsoft" UpgradeCode="acc93cb9-4db9-451c-aae0-1c3cf375bcc3">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+		<MediaTemplate EmbedCab="yes"/>
+
+		<Feature Id="ProductFeature" Title="wixWinServiceDemo" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+		</Feature>
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLFOLDER" Name="wixWinServiceDemo" />
+			</Directory>
+		</Directory>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <Component Id="ServiceExe" Guid="a6935b75-0d45-4a71-ae19-62c12d9877c2">
+        <File Id="ServiceEXE" Name="$(var.winServiceDemo.TargetFileName)" DiskId="1" Source="$(var.SolutionDir)build\$(var.winServiceDemo.Configuration)\winServiceDemo.exe" KeyPath="yes"/>
+        <ServiceInstall Id="ServiceExeInstall" Type="ownProcess" ErrorControl="normal" Vital="yes" Name="MyCompany:MyProduct" DisplayName="MyCompany:MyProduct" Description="My Product Description" Start="auto" Account="LocalSystem" Interactive="no"/>
+        <ServiceControl Id="ServiceExeControl" Start="install" Stop="both" Remove="uninstall" Name="MyCompany:MyProduct" Wait="yes"/>
+      </Component>
+      <Component Id="ServiceControl" Guid="9064fff5-a4ff-47b5-a4b4-c21fe08961d6">
+        <File Id="ServiceControl" Name="$(var.winServiceDemoConfig.TargetFileName)" DiskId="1" Source="$(var.SolutionDir)build\$(var.winServiceDemoConfig.Configuration)\winServiceDemoControl.exe" KeyPath="yes"/>
+      </Component>
+      <Component Id="ServiceConfig" Guid="c8a04241-4d87-417c-ac36-13a0e2c45440">
+        <File Id="ServiceConfig" Name="$(var.winServiceDemoControl.TargetFileName)" DiskId="1" Source="$(var.SolutionDir)build\$(var.winServiceDemoControl.Configuration)\winServiceDemoConfig.exe" KeyPath="yes"/>
+      </Component>
+    </ComponentGroup>
+	</Fragment>
+
+</Wix>

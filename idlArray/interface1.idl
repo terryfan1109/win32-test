@@ -1,0 +1,31 @@
+import "oaidl.idl";
+import "ocidl.idl";
+
+/*
+[ 
+  uuid(e806ba65-bea8-4c24-ad6c-ad71446c3e24),
+  version(1.0)
+]
+interface interface1
+{
+  void f1([in] short capArray, [in] short ceArray, [in, out, size_is(capArray), length_is(ceArray)] wchar_t array[*]);
+}
+*/
+
+typedef struct KeyValuePairTag {
+  BSTR key;
+  BSTR value;
+} KeyValuePair;
+
+[
+    uuid(430436ab-8786-4b19-905f-2e5cc11edda2),
+    version(1.0),
+]
+interface AnInterface
+{
+  HRESULT Add([in] long size, [in, size_is(size)] KeyValuePair * pKvs);
+  HRESULT Get(
+    [out] long * pSize,
+    [out, size_is( , *pSize)] KeyValuePair ** ppKvs
+    );
+}

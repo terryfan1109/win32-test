@@ -28,4 +28,9 @@ interface AnInterface
     [out] long * pSize,
     [out, size_is( , *pSize)] KeyValuePair ** ppKvs
     );
+  HRESULT AsyncGet(
+    [out] long * pSize,
+    [out, size_is( , *pSize)] KeyValuePair ** ppKvs
+    );
 }
+

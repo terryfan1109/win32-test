@@ -3,4 +3,5 @@
 ]
 interface AnInterface
 {
+	[async] AsyncGet();
 }

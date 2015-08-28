@@ -46,13 +46,72 @@ void rpcFunc(handle_t hBinding, int ceKvs, KeyValuePair* kvs) {
     long cbBuffer = -1;
     KeyValuePair *pBuffer = NULL;
     hResult = Get(hBinding, &cbBuffer, &pBuffer);
-    std::wcout << L"number" << cbBuffer << std::endl;
+    std::wcout << L"number: " << cbBuffer << std::endl;
     for (size_t i = 0; i < cbBuffer; ++i) {
       std::wcout << (const wchar_t*) pBuffer[i].key << L": " << (const wchar_t *) pBuffer[i].value << std::endl;
     }
     ::midl_user_free((LPVOID) pBuffer);
 
     std::wcin.get();
+  }
+  RpcExcept(1)
+  {
+    HandleError(L"Remote Procedure Call", RpcExceptionCode());
+  }
+  RpcEndExcept
+}
+
+void rpcAsyncFunc(handle_t hBinding, int ceKvs, KeyValuePair* kvs) {
+  RpcTryExcept 
+  {
+    std::wclog << L"Calling Add" << std::endl;
+    HRESULT hResult = Add(hBinding, ceKvs, kvs);
+
+    std::wcout << L"Press enter to call Output:" << hResult << std::endl;
+    std::wcin.get();
+
+    std::wclog << L"Calling Output" << std::endl;
+    // Calls the RPC function. The hBinding binding handle
+    // is used explicitly.
+
+    RPC_ASYNC_STATE asyncState = {0};
+    RPC_STATUS rt = RpcAsyncInitializeHandle(&asyncState, sizeof(RPC_ASYNC_STATE));
+    if (FAILED(rt)) {
+      HandleError(L"Cannot create async state", rt);
+    }
+    else {
+      asyncState.UserInfo = NULL;
+      asyncState.NotificationType = RpcNotificationTypeEvent; 
+      asyncState.u.hEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+
+      long cbBuffer = -1;
+      KeyValuePair *pBuffer = NULL;
+      AsyncGet(&asyncState, hBinding, &cbBuffer, &pBuffer);
+
+      std::wcout << L"AsyncGet returned and waitting..." << std::endl;
+
+      if (WAIT_FAILED == ::WaitForSingleObject(asyncState.u.hEvent, INFINITE)) {
+        std::wcout << L"WaitForSingleObject(), failed" << std::endl;
+        RpcRaiseException(::GetLastError());
+      }
+
+      HRESULT hr = S_OK;
+      RpcAsyncCompleteCall(&asyncState, &hr);
+
+      if (SUCCEEDED(hr)) {
+        std::wcout << L"number: " << cbBuffer << std::endl;
+        if (0 < cbBuffer) {
+          for (size_t i = 0; i < cbBuffer; ++i) {
+            std::wcout << (const wchar_t*) pBuffer[i].key << L": " << (const wchar_t *) pBuffer[i].value << std::endl;
+          }
+          ::midl_user_free((LPVOID) pBuffer);
+        }
+        std::wcin.get();
+      }
+      else {
+        HandleError(L"RpcAsyncCompleteCall failed", hr);
+      }
+    }
   }
   RpcExcept(1)
   {
@@ -116,7 +175,7 @@ int _tmain(int argc, _TCHAR* argv[])
       kvs[i].value = ::SysAllocString((std::wstring(L"value") + std::to_wstring(i)).c_str());
     }
 
-    rpcFunc(hBinding, sizeof(kvs)/sizeof(kvs[0]), kvs);
+    rpcAsyncFunc(hBinding, sizeof(kvs)/sizeof(kvs[0]), kvs);
 
     for (size_t i = 0; i < sizeof(kvs)/sizeof(kvs[0]); ++i) {
       ::SysFreeString(kvs[i].key);

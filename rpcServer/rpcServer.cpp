@@ -67,6 +67,21 @@ HRESULT Add(
   return S_OK;
 }
 
+void Get(long *pceKvs, KeyValuePair **ppKvs) {
+  if (0 < params.size()) {
+    KeyValuePair * buffer = reinterpret_cast<KeyValuePair*>(midl_user_allocate(params.size() * sizeof(KeyValuePair)));
+    for (size_t i = 0; i < params.size(); ++i) {
+      buffer[i].key = ::SysAllocString(std::get<0>(params[i]).c_str());
+      buffer[i].value = ::SysAllocString(std::get<1>(params[i]).c_str());      
+    }
+    *pceKvs = params.size();
+    *ppKvs = buffer;
+  }
+  else {
+    *pceKvs = 0;
+  }
+}
+
 HRESULT Get( 
     /* [in] */ handle_t IDL_handle,
     /* [out] */ long *pSize,
@@ -74,19 +89,36 @@ HRESULT Get(
 {
   std::wclog << L"Get" << std::endl;
 
-  if (0 < params.size()) {
-    KeyValuePair * buffer = reinterpret_cast<KeyValuePair*>(midl_user_allocate(params.size() * sizeof(KeyValuePair)));
-    for (size_t i = 0; i < params.size(); ++i) {
-      buffer[i].key = ::SysAllocString(std::get<0>(params[i]).c_str());
-      buffer[i].value = ::SysAllocString(std::get<1>(params[i]).c_str());      
-    }
-    *pSize = params.size();
-    *ppKvs = buffer;
+  Get(pSize, ppKvs);
+
+  return S_OK;
+}
+
+void AsyncGet(
+    /* [in] */ PRPC_ASYNC_STATE AsyncGet_AsyncHandle,
+    /* [in] */ handle_t IDL_handle,
+    /* [out] */ long *pSize,
+    /* [size_is][size_is][out] */ KeyValuePair **ppKvs)
+{
+  std::wclog << L"AsyncGet" << std::endl;
+
+  Sleep(5*1000);
+
+  HRESULT result = S_OK;
+
+  RPC_STATUS rt = RpcServerTestCancel(RpcAsyncGetCallHandle(AsyncGet_AsyncHandle));
+  if (RPC_S_OK == rt) {
+    result = E_ABORT;
+  }
+  else if (RPC_S_CALL_IN_PROGRESS == rt) {
+    Get(pSize, ppKvs);
+    result = S_OK;
   }
   else {
-    *pSize = 0;
+    result = E_UNEXPECTED;
   }
-  return S_OK;
+
+  RpcAsyncCompleteCall(AsyncGet_AsyncHandle, &result);
 }
 
 

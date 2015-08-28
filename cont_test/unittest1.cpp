@@ -18,7 +18,7 @@ public:
     MyType::logger.WriteMessage((wstring(L"copy cotr") + ToString((int) this)).c_str());
     value = rhs.value;
   }
-  MyType(MyType&& rhs) noexcept {
+  MyType(MyType&& rhs) {
     using std::swap;
     MyType::logger.WriteMessage((wstring(L"move cotr") + ToString((int) this)).c_str());
     swap(value, rhs.value);

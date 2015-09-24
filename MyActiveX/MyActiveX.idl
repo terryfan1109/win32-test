@@ -1,0 +1,49 @@
+// MyActiveX.idl : type library source for ActiveX Control project.
+
+// This file will be processed by the MIDL compiler tool to
+// produce the type library (MyActiveX.tlb) that will become a resource in
+// MyActiveX.ocx.
+
+#include <olectl.h>
+#include <idispids.h>
+
+[ uuid(5B927B47-0AD8-41A9-8D2D-36510A8D9E09), version(1.0),
+  control ]
+library MyActiveXLib
+{
+	importlib(STDOLE_TLB);
+
+	//  Primary dispatch interface for CMyActiveXCtrl
+	[ 
+		uuid(315EE251-BEB4-4A46-9B1C-E427D8DEDF08)	
+	]
+	dispinterface _DMyActiveX
+	{
+		properties:
+		methods:
+	};
+
+	//  Event dispatch interface for CMyActiveXCtrl
+
+	[ 
+		uuid(686DF7E4-564D-4BC7-AF78-D4854114F5A2)	
+	]
+	dispinterface _DMyActiveXEvents
+	{
+		properties:
+			//  Event interface has no properties
+
+		methods:
+	};
+
+	//  Class information for CMyActiveXCtrl
+	[
+		uuid(28800FF0-3E5B-429F-95FD-536D3559B715)
+	]
+	coclass MyActiveX
+	{
+		[default] dispinterface _DMyActiveX;
+		[default, source] dispinterface _DMyActiveXEvents;
+	};
+
+};

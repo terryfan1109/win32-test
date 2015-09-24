@@ -1,0 +1,25 @@
+[
+	uuid(05F902E3-CEB9-4D5D-BCBC-682AD435F0AF),
+	version(1.0), helpcontext(16),
+	helpstring("Echo 1.0 Type Library")
+]
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+library EchoLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	[
+		object,
+		uuid(DDFC3A7E-97B1-45BD-BA31-1F65D03ABF7A),
+		helpstring("CalculatorEvent Interface"),
+		pointer_default(unique)
+	]
+	interface CalculatorEvent : IDispatch {
+
+	};
+
+}

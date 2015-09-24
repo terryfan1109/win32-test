@@ -1,0 +1,50 @@
+message Customer {
+  required string firstName = 1;
+  required string lastName = 2;
+  optional int32 age = 3;
+}
+
+enum RequestType {
+  Unknown = 0;
+  GetCustomers = 1;
+  PostCustomer = 2;
+  DeleteCustomer = 3;
+}
+
+message PostCustomerRequest {
+  required int32 version = 1 [default = 0]; 
+  required Customer customer = 101;
+}
+
+message PostCustomerResponse {
+  required int32 version = 1 [default = 0]; 
+  required int32 result = 2;
+}
+
+message GetCustomerRequest {
+  required int32 version = 1 [default = 0];
+}
+
+message GetCustomerResponse {
+  required int32 version = 1 [default = 0];
+  required int32 result = 2;
+  repeated Customer customers = 101;
+}
+
+message DeleteCustomerRequest {
+  required int32 version = 1 [default = 0];
+  required Customer customer = 101;
+}
+
+message DeleteCustomerResponse {
+  required int32 version = 1 [default = 0];
+  required int32 result = 2;
+}
+
+message Request {
+  required int32 version = 1 [default = 0];
+  required RequestType method = 2;
+  optional GetCustomerRequest get = 101;
+  optional PostCustomerRequest post = 102;
+  optional DeleteCustomerRequest delete = 103;
+}

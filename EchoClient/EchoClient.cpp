@@ -77,17 +77,17 @@ void process() {
 	libCSharpEcho::CalculatorCallbackPtr pCallback;
 	pCallback.Attach(pv, false);
 
-	calculator->asyncCalculate(pCallback, input);
+	calculator->asyncCalculate(pCallback, input);	
 
 	hr = eventSink.DispEventUnadvise(calculator, &eventSink.m_iid);
 }
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	CoInitialize(NULL);	
-	CComModule _Module;
-	process();
-	CoUninitialize();
-	return 0;
+		CoInitialize(NULL);	
+		CComModule _Module;
+		process();
+		CoUninitialize();
+		return 0;
 }
 

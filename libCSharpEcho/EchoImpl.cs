@@ -28,10 +28,12 @@ namespace libCSharpEcho
     {
         int calculate(String value);
         void asyncCalculate(CalculatorCallback callback, String value);
+        int calculateCollection(String[] values);
     }
 
     [ComVisible(true), ClassInterface(ClassInterfaceType.None), Guid("A77CB584-8C98-4463-B090-84418F1740AF")]
     [ComSourceInterfaces(typeof(CalculatorEvent))]
+    [ProgId("EchoLib.CalculatorImpl")]
     public class CalculatorImpl : Calculator
     {
         public event eventDelegate onEvent;
@@ -42,8 +44,16 @@ namespace libCSharpEcho
             {
                 onEvent(1);
             }
-
             return value.Length;
+        }
+
+        public int calculateCollection(String[] values)
+        {
+            int result = 0;
+            foreach(String elm in values) {
+                result += calculate(elm);
+            }
+            return result;
         }
 
         public void asyncCalculate(CalculatorCallback callback, String value)
@@ -52,7 +62,6 @@ namespace libCSharpEcho
             {
                 onEvent(2);
             }
-
             callback.callback(value.Length);
         }
     }

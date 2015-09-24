@@ -1,0 +1,21 @@
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(f4db45dc-0dcb-4003-b680-56c40f6cb6a8),
+	version(1.0),
+]
+interface RPCTransport
+{
+	HRESULT execute(
+		[in] long cbInput,
+		[size_is(cbInput)] byte input[*],
+		[out] long *cbOutput,
+		[out, size_is(, *cbOutput)] byte **output);
+
+	HRESULT executeAsync(
+		[in] long cbInput,
+		[size_is(cbInput)] byte input[*],
+		[out] long *cbOutput,
+		[out, size_is(, *cbOutput)] byte **output);
+}

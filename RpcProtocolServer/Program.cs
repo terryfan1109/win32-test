@@ -28,15 +28,16 @@ namespace RpcProtocolServer
     static void Main(string[] args)
     {
       // The client and server must agree on the interface id to use:
-      var iid = new Guid("{0092F74D-0EA7-4667-A89F-A04C64244031}");
-
+      //var iid = new Guid("{0092F74D-0EA7-4667-A89F-A04C64244031}");
+      var iid = new Guid("{78323803-786f-4f7b-908d-b2e89c41d45f}");
+      
       // Create the server instance, adjust the defaults to your needs.
       using (var server = new RpcServerApi(iid, 100, ushort.MaxValue, allowAnonTcp: false))
       {
         try
         {
           // Add an endpoint so the client can connect, this is local-host only:
-          server.AddProtocol(RpcProtseq.ncalrpc, "5678", 100);
+          server.AddProtocol(RpcProtseq.ncalrpc, "12345", 100);
 
           // If you want to use TCP/IP uncomment the following, make sure your client authenticates or allowAnonTcp is true
           // server.AddProtocol(RpcProtseq.ncacn_ip_tcp, @"8080", 25);

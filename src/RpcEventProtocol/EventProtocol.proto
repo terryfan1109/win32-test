@@ -1,0 +1,19 @@
+package Rpc.Event.Protocol;
+
+message Request {
+  required int32 version = 1 [default=1];
+  required int32 value = 101;
+};
+
+message Response {
+  required int32 version = 1 [default=1];
+};
+
+message EventRequest {
+  required int32 version = 1 [default=1];
+};
+
+message EventResponse {
+  required int32 version = 1 [default=1];
+  required int32 eventId = 101;
+};

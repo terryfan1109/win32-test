@@ -147,11 +147,17 @@ namespace RpcTransport
       return InvokeRpc(_handle, IID, input);
     }
 
+    public struct ExecuteAsyncResponse
+    {
+      public RpcError result;
+      public byte[] response;
+    }
+
     /// <summary>
     /// Send a message asynchronous
     /// </summary>
     /// 
-    public Task<byte[]> ExecuteAsync(byte[] input)
+    public Task<ExecuteAsyncResponse> ExecuteAsync(byte[] input)
     {
       return Task.Factory.StartNew( () =>
       {
@@ -164,9 +170,11 @@ namespace RpcTransport
 
         var evnt = new ManualResetEvent(false);
 
-        byte[] result = new byte[0];
-        InvokeRpcAsync(_handle, IID, input, (r) => { result = r; evnt.Set(); });
+        ExecuteAsyncResponse result;
+        result.result = RpcError.RPC_E_FAIL;
+        result.response = null;
 
+        InvokeRpcAsync(_handle, IID, input, (r) => { result = r; evnt.Set(); });
         evnt.WaitOne();
 
         return result;
@@ -184,34 +192,17 @@ namespace RpcTransport
       {
         if (handle != IntPtr.Zero)
         {
-          RpcException.Assert(RpcBindingFree(ref Handle));
+          RpcException.Assert(RpcApi.RpcBindingFree(ref Handle));
           handle = IntPtr.Zero;
         }
       }
     }
 
-    [DllImport("Rpcrt4.dll", EntryPoint = "RpcStringFreeW", CallingConvention = CallingConvention.StdCall,
-        CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern RpcError RpcStringFree(ref IntPtr lpString);
-
-    [DllImport("Rpcrt4.dll", EntryPoint = "RpcBindingFree", CallingConvention = CallingConvention.StdCall,
-        CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern RpcError RpcBindingFree(ref IntPtr lpString);
-
-    #region RpcStringBindingCompose
-
-    [DllImport("Rpcrt4.dll", EntryPoint = "RpcStringBindingComposeW", CallingConvention = CallingConvention.StdCall,
-        CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern RpcError RpcStringBindingCompose(
-        String ObjUuid, String ProtSeq, String NetworkAddr, String Endpoint, String Options,
-        out IntPtr lpBindingString
-        );
-
     private static String StringBindingCompose(RpcProtseq ProtSeq, String NetworkAddr, String Endpoint,
                                                String Options)
     {
       IntPtr lpBindingString;
-      RpcError result = RpcStringBindingCompose(null, ProtSeq.ToString(), NetworkAddr, Endpoint, Options,
+      RpcError result = RpcApi.RpcStringBindingCompose(null, ProtSeq.ToString(), NetworkAddr, Endpoint, Options,
                                                 out lpBindingString);
       RpcException.Assert(result);
 
@@ -221,41 +212,15 @@ namespace RpcTransport
       }
       finally
       {
-        RpcException.Assert(RpcStringFree(ref lpBindingString));
+        RpcException.Assert(RpcApi.RpcStringFree(ref lpBindingString));
       }
     }
 
-    #endregion
-
-    #region RpcBindingFromStringBinding
-
-    [DllImport("Rpcrt4.dll", EntryPoint = "RpcBindingFromStringBindingW",
-        CallingConvention = CallingConvention.StdCall,
-        CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern RpcError RpcBindingFromStringBinding(String bindingString, out IntPtr lpBinding);
-
     private static void BindingFromStringBinding(RpcHandle handle, String bindingString)
     {
-      RpcError result = RpcBindingFromStringBinding(bindingString, out handle.Handle);
+      RpcError result = RpcApi.RpcBindingFromStringBinding(bindingString, out handle.Handle);
       RpcException.Assert(result);
     }
-
-    #endregion
-
-    #region RpcBindingSetAuthInfo
-
-    [DllImport("Rpcrt4.dll", EntryPoint = "RpcBindingSetAuthInfoW", CallingConvention = CallingConvention.StdCall,
-        CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern RpcError RpcBindingSetAuthInfo(IntPtr Binding, String ServerPrincName,
-                                                         RpcProtectionLevel AuthnLevel, RpcAuthentication AuthnSvc,
-                                                         [In] ref SEC_WINNT_AUTH_IDENTITY AuthIdentity,
-                                                         uint AuthzSvc);
-
-    [DllImport("Rpcrt4.dll", EntryPoint = "RpcBindingSetAuthInfoW", CallingConvention = CallingConvention.StdCall,
-        CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern RpcError RpcBindingSetAuthInfo2(IntPtr Binding, String ServerPrincName,
-                                                          RpcProtectionLevel AuthnLevel, RpcAuthentication AuthnSvc,
-                                                          IntPtr p, uint AuthzSvc);
 
     private static void BindingSetAuthInfo(RpcProtectionLevel level, RpcAuthentication[] authTypes,
         RpcHandle handle, string serverPrincipalName, NetworkCredential credentails)
@@ -264,7 +229,7 @@ namespace RpcTransport
       {
         foreach (RpcAuthentication atype in authTypes)
         {
-          RpcError result = RpcBindingSetAuthInfo2(handle.Handle, serverPrincipalName, level, atype, IntPtr.Zero, 0);
+          RpcError result = RpcApi.RpcBindingSetAuthInfo2(handle.Handle, serverPrincipalName, level, atype, IntPtr.Zero, 0);
           if (result != RpcError.RPC_S_OK)
             Log.Warning("Unable to register {0}, result = {1}", atype, new RpcException(result).Message);
         }
@@ -274,48 +239,12 @@ namespace RpcTransport
         SEC_WINNT_AUTH_IDENTITY pSecInfo = new SEC_WINNT_AUTH_IDENTITY(credentails);
         foreach (RpcAuthentication atype in authTypes)
         {
-          RpcError result = RpcBindingSetAuthInfo(handle.Handle, serverPrincipalName, level, atype, ref pSecInfo, 0);
+          RpcError result = RpcApi.RpcBindingSetAuthInfo(handle.Handle, serverPrincipalName, level, atype, ref pSecInfo, 0);
           if (result != RpcError.RPC_S_OK)
             Log.Warning("Unable to register {0}, result = {1}", atype, new RpcException(result).Message);
         }
       }
     }
-
-    #endregion
-
-    #region RPC Async APIs
-    [DllImport("Rpcrt4.dll", EntryPoint = "RpcAsyncInitializeHandle", CallingConvention = CallingConvention.StdCall,
-        CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern IntPtr RpcAsyncInitializeHandle(IntPtr pAsync, int cbAsync);
-
-    [DllImport("Rpcrt4.dll", EntryPoint = "RpcAsyncCompleteCall", CallingConvention = CallingConvention.StdCall,
-        CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern IntPtr RpcAsyncCompleteCall(IntPtr pAsync, [Out] out IntPtr hr);
-
-    #endregion
-
-    #region NdrClientCall2/InvokeRpc
-
-    [DllImport("Rpcrt4.dll", EntryPoint = "NdrClientCall2", CallingConvention = CallingConvention.Cdecl,
-        CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern IntPtr NdrClientCall2x86(IntPtr pMIDL_STUB_DESC, IntPtr formatString, IntPtr args);
-
-    [DllImport("Rpcrt4.dll", EntryPoint = "NdrClientCall2", CallingConvention = CallingConvention.Cdecl,
-        CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern IntPtr NdrClientCall2x64(IntPtr pMIDL_STUB_DESC, IntPtr formatString, IntPtr Handle,
-                                                   int DataSize, IntPtr Data, [Out] out int ResponseSize,
-                                                   [Out] out IntPtr Response);
-
-    [DllImport("Rpcrt4.dll", EntryPoint = "NdrAsyncClientCall", CallingConvention = CallingConvention.Cdecl,
-        CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern IntPtr NdrAsyncClientCallx86(IntPtr pMIDL_STUB_DESC, IntPtr formatString, IntPtr args);
-
-    [DllImport("Rpcrt4.dll", EntryPoint = "NdrAsyncClientCall", CallingConvention = CallingConvention.Cdecl,
-        CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern IntPtr NdrAsyncClientCallx64(IntPtr pMIDL_STUB_DESC, IntPtr formatString, IntPtr asyncHandle,
-                                                       IntPtr Handle, int cbInput, IntPtr input, [Out] out int cbOutput,
-                                                       [Out] out IntPtr Response);
-
 
     [MethodImpl(MethodImplOptions.NoInlining | (MethodImplOptions)64 /* MethodImplOptions.NoOptimization undefined in 2.0 */)]
     private static byte[] InvokeRpc(RpcHandle handle, Guid iid, byte[] input)
@@ -341,13 +270,22 @@ namespace RpcTransport
         {
           try
           {
-            result = NdrClientCall2x64(pStub.Handle, RpcApi.FUNC_FORMAT_PTR.Handle, handle.Handle,
-                                       input.Length,
-                                       pInputBuffer.Handle, out szResponse, out response);
+            result = RpcApi.NdrClientCall2x64(
+              pStub.Handle, RpcApi.FUNC_FORMAT_PTR.Handle, handle.Handle,
+              input.Length, pInputBuffer.Handle, out szResponse, out response
+              );
           }
           catch (SEHException ex)
           {
-            RpcException.Assert(ex.ErrorCode);
+            int internalError = ex.ErrorCode;
+            if ((uint)RpcError.RPC_E_FAIL == (uint)internalError)
+            {
+              if ((int)RpcError.RPC_S_OK != Marshal.GetExceptionCode())
+              {
+                internalError = Marshal.GetExceptionCode();
+              }
+            }
+            RpcException.Assert(internalError);
             throw;
           }
         }
@@ -364,11 +302,19 @@ namespace RpcTransport
 
             try
             {
-              result = NdrClientCall2x86(pStub.Handle, RpcApi.FUNC_FORMAT_PTR.Handle, pStack32.Handle);
+              result = RpcApi.NdrClientCall2x86(pStub.Handle, RpcApi.FUNC_FORMAT_PTR.Handle, pStack32.Handle);
             }
             catch (SEHException ex)
             {
-              RpcException.Assert(ex.ErrorCode);
+              int internalError = ex.ErrorCode;
+              if ((uint)RpcError.RPC_E_FAIL == (uint)internalError)
+              {
+                if ((int)RpcError.RPC_S_OK != Marshal.GetExceptionCode())
+                {
+                  internalError = Marshal.GetExceptionCode();
+                }
+              }
+              RpcException.Assert(internalError);
               throw;
             }
           }
@@ -376,6 +322,7 @@ namespace RpcTransport
         GC.KeepAlive(pInputBuffer);
       }
       RpcException.Assert(result.ToInt32());
+
       szResponse = pszResponse.Data;
       response = pResponse.Data;
       byte[] output = new byte[szResponse];
@@ -391,7 +338,7 @@ namespace RpcTransport
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     public delegate void AsyncCallback(IntPtr pAsync, IntPtr pContext, RpcAsyncEvent _event);
 
-    public delegate void APICallback(byte[] response);
+    public delegate void APICallback(ExecuteAsyncResponse response);
     public delegate void AsyncRpcCallbackRountine(IntPtr response);
 
     [MethodImpl(MethodImplOptions.NoInlining | (MethodImplOptions)64 /* MethodImplOptions.NoOptimization undefined in 2.0 */)]
@@ -401,8 +348,7 @@ namespace RpcTransport
       Ptr<MIDL_STUB_DESC> pStub;
       if (!handle.GetPtr(out pStub))
       {
-        pStub =
-            handle.CreatePtr(new MIDL_STUB_DESC(
+        pStub = handle.CreatePtr(new MIDL_STUB_DESC(
               handle, handle.Pin(new RPC_CLIENT_INTERFACE(iid)), RpcApi.TYPE_FORMAT, false));
       }
 
@@ -416,24 +362,50 @@ namespace RpcTransport
       {
         AsyncCallback cbRountine = (IntPtr pAsync, IntPtr pContext, RpcAsyncEvent _event) =>
         {
-          IntPtr hr = RpcAsyncCompleteCall(pAsync, out result);
-          RpcException.Assert(hr.ToInt32());
+          RPC_ASYNC_STATE async = (RPC_ASYNC_STATE)Marshal.PtrToStructure(pAsync, typeof(RPC_ASYNC_STATE));
+          var myCallback = (APICallback)Marshal.GetDelegateForFunctionPointer(async.UserInfo, typeof(APICallback));
 
-          if (0 == result.ToInt32())
+          RpcError hr = RpcApi.RpcAsyncCompleteCall(pAsync, ref result);
+          if (RpcError.RPC_S_OK == hr)
           {
-            try
+            if (RpcError.RPC_S_OK == (RpcError) result.ToInt32())
             {
-              RPC_ASYNC_STATE async = (RPC_ASYNC_STATE)Marshal.PtrToStructure(pAsync, typeof(RPC_ASYNC_STATE));
-              cbOutput = pcbOutput.Data;
-              byte[] _output = new byte[cbOutput];
-              Marshal.Copy(pOutput.Data, _output, 0, cbOutput);
-              var myCallback = (APICallback)Marshal.GetDelegateForFunctionPointer(async.UserInfo, typeof(APICallback));
-              myCallback(_output);
+              ExecuteAsyncResponse response;
+              try
+              {
+                cbOutput = pcbOutput.Data;
+                byte[] _output = new byte[cbOutput];
+                Marshal.Copy(pOutput.Data, _output, 0, cbOutput);
+
+                response.result = RpcError.RPC_S_OK;
+                response.response = _output;
+              }
+              catch (Exception e)
+              {
+                response.result = RpcError.RPC_E_FAIL;
+                response.response = null;
+              }
+              finally
+              {
+                RpcApi.Free(pOutput.Data);
+              }
+
+              myCallback(response);
             }
-            finally
+            else
             {
-              RpcApi.Free(pOutput.Data);
+              ExecuteAsyncResponse response;
+              response.result = (RpcError)result.ToInt32();
+              response.response = null;
+              myCallback(response);
             }
+          }
+          else
+          {
+            ExecuteAsyncResponse response;
+            response.result = hr;
+            response.response = null;
+            myCallback(response);
           }
         };
 
@@ -441,7 +413,7 @@ namespace RpcTransport
 
         RPC_ASYNC_STATE asyncState = new RPC_ASYNC_STATE();
         var _pAsyncState = new Ptr<RPC_ASYNC_STATE>(asyncState);
-        RpcAsyncInitializeHandle(_pAsyncState.Handle, Marshal.SizeOf(typeof(RPC_ASYNC_STATE)));
+        RpcApi.RpcAsyncInitializeHandle(_pAsyncState.Handle, Marshal.SizeOf(typeof(RPC_ASYNC_STATE)));
         asyncState.Event = _pAsyncState.Data.Event;
         asyncState.Flags = _pAsyncState.Data.Flags;
         asyncState.Lock = _pAsyncState.Data.Lock;
@@ -461,7 +433,7 @@ namespace RpcTransport
         {
           try
           {
-            result = NdrAsyncClientCallx64(pStub.Handle, RpcApi.ASYNC_FUNC_FORMAT_PTR.Handle, pAsyncState.Handle, handle.Handle,
+            result = RpcApi.NdrAsyncClientCallx64(pStub.Handle, RpcApi.ASYNC_FUNC_FORMAT_PTR.Handle, pAsyncState.Handle, handle.Handle,
               input.Length, pInputBuffer.Handle, out cbOutput, out output);
           }
           catch (SEHException ex)
@@ -484,7 +456,7 @@ namespace RpcTransport
 
             try
             {
-              result = NdrAsyncClientCallx86(pStub.Handle, RpcApi.ASYNC_FUNC_FORMAT_PTR.Handle, pStack32.Handle);
+              result = RpcApi.NdrAsyncClientCallx86(pStub.Handle, RpcApi.ASYNC_FUNC_FORMAT_PTR.Handle, pStack32.Handle);
             }
             catch (SEHException ex)
             {
@@ -501,6 +473,5 @@ namespace RpcTransport
       Log.Verbose("InvokeRpc.InvokeRpc response on {0}", handle.Handle);
     }
 
-    #endregion
   }
 }

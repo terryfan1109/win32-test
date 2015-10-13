@@ -22,7 +22,7 @@ namespace RpcProtocolClient
       return client.Execute(buffer);
     }
 
-    static Task<byte[]> ExecuteAsync(RpcClientApi client, Stream stream)
+    static Task<RpcClientApi.ExecuteAsyncResponse> ExecuteAsync(RpcClientApi client, Stream stream)
     {
       byte[] buf = new byte[stream.Length];
       stream.Seek(0, SeekOrigin.Begin);
@@ -70,7 +70,7 @@ namespace RpcProtocolClient
       var task = ExecuteAsync(client, stream).ContinueWith(r =>
       {
         var response = ProtoBuf.Serializer.Deserialize<RpcProto.PostCustomerResponse>(
-          new MemoryStream(r.Result));
+          new MemoryStream(r.Result.response));
 
         if (0 != response.result)
         {
@@ -98,7 +98,7 @@ namespace RpcProtocolClient
       var task = ExecuteAsync(client, stream).ContinueWith(r =>
       {
         var response = ProtoBuf.Serializer.Deserialize<RpcProto.DeleteCustomerResponse>(
-          new MemoryStream(r.Result));
+          new MemoryStream(r.Result.response));
 
         if (0 != response.result)
         {

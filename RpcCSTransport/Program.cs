@@ -36,7 +36,7 @@ namespace RpcCSTransport
             var task = client.ExecuteAsync(Encoding.UTF8.GetBytes(args.Length == 0 ? "Greetines" : args[0])).
               ContinueWith<String>( r =>
               {
-                return Encoding.UTF8.GetString(r.Result);
+                return Encoding.UTF8.GetString(r.Result.response);
               });
 
             task.Wait();

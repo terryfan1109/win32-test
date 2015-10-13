@@ -37,8 +37,7 @@ namespace TAPTest
             progress.Report(((double) i)/totalCount);
           }
         }
-        if (null != progress)
-        {
+        if (null != progress) {
           progress.Report(100.0);
         }
         return number;

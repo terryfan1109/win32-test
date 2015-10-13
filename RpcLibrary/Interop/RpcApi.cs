@@ -454,5 +454,111 @@ namespace RpcLibrary.Interop
     public static FunctionPtr<LocalFree> FreePtr = new FunctionPtr<LocalFree>(Free);
 
     #endregion
+
+    [DllImport("Rpcrt4.dll", EntryPoint = "RpcServerUnregisterIf", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern RpcError RpcServerUnregisterIf(IntPtr IfSpec, IntPtr MgrTypeUuid, uint WaitForCallsToComplete);
+
+    [DllImport("Rpcrt4.dll", EntryPoint = "RpcServerUseProtseqEpW", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern RpcError RpcServerUseProtseqEp(String Protseq, int MaxCalls, String Endpoint, IntPtr SecurityDescriptor);
+
+    [DllImport("Rpcrt4.dll", EntryPoint = "RpcServerRegisterIf2", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern RpcError RpcServerRegisterIf2(IntPtr IfSpec, IntPtr MgrTypeUuid, IntPtr MgrEpv, int Flags, int MaxCalls, int MaxRpcSize, IntPtr hProc);
+
+    [DllImport("Rpcrt4.dll", EntryPoint = "RpcServerRegisterIf", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern RpcError RpcServerRegisterIf(IntPtr IfSpec, IntPtr MgrTypeUuid, IntPtr MgrEpv);
+
+    [DllImport("Rpcrt4.dll", EntryPoint = "RpcServerRegisterAuthInfoW",
+        CallingConvention = CallingConvention.StdCall,
+        CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern RpcError RpcServerRegisterAuthInfo(String ServerPrincName, uint AuthnSvc, IntPtr GetKeyFn, IntPtr Arg);
+
+    [DllImport("Rpcrt4.dll", EntryPoint = "RpcServerListen", CallingConvention = CallingConvention.StdCall,
+        CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern RpcError RpcServerListen(uint MinimumCallThreads, int MaxCalls, uint DontWait);
+
+    [DllImport("Rpcrt4.dll", EntryPoint = "RpcMgmtStopServerListening",
+        CallingConvention = CallingConvention.StdCall,
+        CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern RpcError RpcMgmtStopServerListening(IntPtr ignore);
+
+    [DllImport("Rpcrt4.dll", EntryPoint = "RpcMgmtWaitServerListen", CallingConvention = CallingConvention.StdCall,
+        CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern RpcError RpcMgmtWaitServerListen();
+
+    [DllImport("Rpcrt4.dll", EntryPoint = "RpcAsyncGetCallStatus", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern RpcError RpcAsyncGetCallStatus(IntPtr pAsyncState);
+
+    [DllImport("Rpcrt4.dll", EntryPoint = "RpcAsyncCompleteCall", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern RpcError RpcAsyncCompleteCall(IntPtr pAsyncState, ref IntPtr result);
+
+    [DllImport("Rpcrt4.dll", EntryPoint = "RpcAsyncAbortCall", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern RpcError RpcAsyncCancelCall(IntPtr pAsyncState, bool fAbort);
+
+    [DllImport("Rpcrt4.dll", EntryPoint = "RpcAsyncCancelCall", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern RpcError RpcAsyncAbortCall(IntPtr pAsyncState, uint result);
+
+    [DllImport("Rpcrt4.dll", EntryPoint = "RpcServerTestCancel", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern RpcError RpcServerTestCancel(IntPtr bindingHandle);
+
+    [DllImport("Rpcrt4.dll", EntryPoint = "RpcStringFreeW", CallingConvention = CallingConvention.StdCall,
+        CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern RpcError RpcStringFree(ref IntPtr lpString);
+
+    [DllImport("Rpcrt4.dll", EntryPoint = "RpcBindingFree", CallingConvention = CallingConvention.StdCall,
+        CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern RpcError RpcBindingFree(ref IntPtr lpString);
+
+    [DllImport("Rpcrt4.dll", EntryPoint = "RpcStringBindingComposeW", CallingConvention = CallingConvention.StdCall,
+        CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern RpcError RpcStringBindingCompose(
+        String ObjUuid, String ProtSeq, String NetworkAddr, String Endpoint, String Options,
+        out IntPtr lpBindingString
+        );
+
+    [DllImport("Rpcrt4.dll", EntryPoint = "RpcBindingFromStringBindingW",
+        CallingConvention = CallingConvention.StdCall,
+        CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern RpcError RpcBindingFromStringBinding(String bindingString, out IntPtr lpBinding);
+
+    [DllImport("Rpcrt4.dll", EntryPoint = "NdrClientCall2", CallingConvention = CallingConvention.Cdecl,
+        CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern IntPtr NdrClientCall2x86(IntPtr pMIDL_STUB_DESC, IntPtr formatString, IntPtr args);
+
+    [DllImport("Rpcrt4.dll", EntryPoint = "NdrClientCall2", CallingConvention = CallingConvention.Cdecl,
+        CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern IntPtr NdrClientCall2x64(IntPtr pMIDL_STUB_DESC, IntPtr formatString, IntPtr Handle,
+                                                   int DataSize, IntPtr Data, [Out] out int ResponseSize,
+                                                   [Out] out IntPtr Response);
+
+    [DllImport("Rpcrt4.dll", EntryPoint = "NdrAsyncClientCall", CallingConvention = CallingConvention.Cdecl,
+        CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern IntPtr NdrAsyncClientCallx86(IntPtr pMIDL_STUB_DESC, IntPtr formatString, IntPtr args);
+
+    [DllImport("Rpcrt4.dll", EntryPoint = "NdrAsyncClientCall", CallingConvention = CallingConvention.Cdecl,
+        CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern IntPtr NdrAsyncClientCallx64(IntPtr pMIDL_STUB_DESC, IntPtr formatString, IntPtr asyncHandle,
+                                                       IntPtr Handle, int cbInput, IntPtr input, [Out] out int cbOutput,
+                                                       [Out] out IntPtr Response);
+
+    [DllImport("Rpcrt4.dll", EntryPoint = "RpcAsyncInitializeHandle", CallingConvention = CallingConvention.StdCall,
+        CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern IntPtr RpcAsyncInitializeHandle(IntPtr pAsync, int cbAsync);
+
+    [DllImport("Rpcrt4.dll", EntryPoint = "RpcBindingSetAuthInfoW", CallingConvention = CallingConvention.StdCall,
+        CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern RpcError RpcBindingSetAuthInfo2(IntPtr Binding, String ServerPrincName,
+                                                          RpcProtectionLevel AuthnLevel, RpcAuthentication AuthnSvc,
+                                                          IntPtr p, uint AuthzSvc);
+
+    [DllImport("Rpcrt4.dll", EntryPoint = "RpcBindingSetAuthInfoW", CallingConvention = CallingConvention.StdCall,
+        CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern RpcError RpcBindingSetAuthInfo(IntPtr Binding, String ServerPrincName,
+                                                         RpcProtectionLevel AuthnLevel, RpcAuthentication AuthnSvc,
+                                                         [In] ref SEC_WINNT_AUTH_IDENTITY AuthIdentity,
+                                                         uint AuthzSvc);
+
+    //[DllImport("Rpcrt4.dll", EntryPoint = "RpcBindingFree", CallingConvention = CallingConvention.StdCall,
+    //    CharSet = CharSet.Unicode, SetLastError = true)]
+    //public static extern RpcError RpcBindingFree(ref IntPtr lpString);
   }
 }

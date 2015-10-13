@@ -75,4 +75,8 @@ namespace RpcTransport.Interop.Structs
 
     internal delegate void RpcExecuteAsync(
         IntPtr pAsyncState, IntPtr clientHandle, uint szInput, IntPtr input, out uint szOutput, out IntPtr output);
+
+    internal delegate void RpcExecuteAsync2(
+        IntPtr pAsyncState, IntPtr clientHandle, uint szInput, IntPtr input, IntPtr szOutput, IntPtr output);
+
 }

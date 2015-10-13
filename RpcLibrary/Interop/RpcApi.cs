@@ -25,8 +25,6 @@ namespace RpcLibrary.Interop
   /// </summary>
   public static class RpcApi
   {
-    #region MIDL_FORMAT_STRINGS
-
     public static readonly bool Is64BitProcess;
     public static readonly byte[] TYPE_FORMAT;
     public static readonly byte[] FUNC_FORMAT;
@@ -144,7 +142,7 @@ namespace RpcLibrary.Interop
 /* 42 */    0x50, 0x21, // NdrFcShort( 0x2150 ),    /* Flags:  out, base type, simple ref, srv alloc size=8 */
 /* 44 */    0x18, 0x0,  // NdrFcShort( 0x18 ),    /* X64 Stack size/offset = 24 */
 /* 46 */    0x8,        /* FC_LONG */
-                0x0,        /* 0 */
+            0x0,        /* 0 */
 
     /* Parameter cbOutput */
 
@@ -157,7 +155,7 @@ namespace RpcLibrary.Interop
 /* 54 */    0x70, 0x0,  // NdrFcShort( 0x70 ),    /* Flags:  out, return, base type, */
 /* 56 */    0x28, 0x0,  // NdrFcShort( 0x28 ),    /* X64 Stack size/offset = 40 */
 /* 58 */    0x8,        /* FC_LONG */
-                0x0,        /* 0 */
+            0x0,        /* 0 */
 
     /* Procedure executeAsync */
 
@@ -194,26 +192,26 @@ namespace RpcLibrary.Interop
 
 /* 96 */    0xb, 0x0,  // NdrFcShort( 0xb ),    /* Flags:  must size, must free, in, */
 /* 98 */    0x18, 0x0, // NdrFcShort( 0x18 ),    /* X64 Stack size/offset = 24 */
-/* 100 */    0x26, 0x0, // NdrFcShort( 0x26 ),    /* Type Offset=38 */
+/* 100 */   0x26, 0x0, // NdrFcShort( 0x26 ),    /* Type Offset=38 */
 
     /* Parameter input */
 
-/* 102 */    0x50, 0x21, // NdrFcShort( 0x2150 ),    /* Flags:  out, base type, simple ref, srv alloc size=8 */
-/* 104 */    0x20, 0x0,  // NdrFcShort( 0x20 ),    /* X64 Stack size/offset = 32 */
-/* 106 */    0x8,        /* FC_LONG */
+/* 102 */   0x50, 0x21, // NdrFcShort( 0x2150 ),    /* Flags:  out, base type, simple ref, srv alloc size=8 */
+/* 104 */   0x20, 0x0,  // NdrFcShort( 0x20 ),    /* X64 Stack size/offset = 32 */
+/* 106 */   0x8,        /* FC_LONG */
             0x0,        /* 0 */
 
     /* Parameter cbOutput */
 
-/* 108 */    0x13, 0x20, // NdrFcShort( 0x2013 ),    /* Flags:  must size, must free, out, srv alloc size=8 */
-/* 110 */    0x28, 0x0,  // NdrFcShort( 0x28 ),    /* X64 Stack size/offset = 40 */
-/* 112 */    0x32, 0x0,  // NdrFcShort( 0x32 ),    /* Type Offset=50 */
+/* 108 */   0x13, 0x20, // NdrFcShort( 0x2013 ),    /* Flags:  must size, must free, out, srv alloc size=8 */
+/* 110 */   0x28, 0x0,  // NdrFcShort( 0x28 ),    /* X64 Stack size/offset = 40 */
+/* 112 */   0x32, 0x0,  // NdrFcShort( 0x32 ),    /* Type Offset=50 */
 
     /* Parameter output */
 
-/* 114 */    0x70, 0x0,  // NdrFcShort( 0x70 ),    /* Flags:  out, return, base type, */
-/* 116 */    0x30, 0x0,  // NdrFcShort( 0x30 ),    /* X64 Stack size/offset = 48 */
-/* 118 */    0x8,        /* FC_LONG */
+/* 114 */   0x70, 0x0,  // NdrFcShort( 0x70 ),    /* Flags:  out, return, base type, */
+/* 116 */   0x30, 0x0,  // NdrFcShort( 0x30 ),    /* X64 Stack size/offset = 48 */
+/* 118 */   0x8,        /* FC_LONG */
             0x0,        /* 0 */
 
             0x0
@@ -405,11 +403,6 @@ namespace RpcLibrary.Interop
         FUNC_FORMAT.Skip(ASYNC_FUNC_OFFSETS[1]).Take(FUNC_FORMAT.Length - ASYNC_FUNC_OFFSETS[1]).ToArray());
     }
 
-
-    #endregion
-
-    #region Memory Utils
-
     [DllImport("Kernel32.dll", EntryPoint = "LocalFree", SetLastError = true,
         CharSet = CharSet.Unicode, ExactSpelling = true, CallingConvention = CallingConvention.Winapi)]
     private static extern IntPtr LocalFree(IntPtr memHandle);
@@ -452,8 +445,6 @@ namespace RpcLibrary.Interop
 
     public static FunctionPtr<LocalAlloc> AllocPtr = new FunctionPtr<LocalAlloc>(Alloc);
     public static FunctionPtr<LocalFree> FreePtr = new FunctionPtr<LocalFree>(Free);
-
-    #endregion
 
     [DllImport("Rpcrt4.dll", EntryPoint = "RpcServerUnregisterIf", CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode, SetLastError = true)]
     public static extern RpcError RpcServerUnregisterIf(IntPtr IfSpec, IntPtr MgrTypeUuid, uint WaitForCallsToComplete);

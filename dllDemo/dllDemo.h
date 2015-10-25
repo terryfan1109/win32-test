@@ -13,6 +13,7 @@
 // This class is exported from the dllDemo.dll
 class DLLDEMO_API CdllDemo {
 public:
+
 	CdllDemo(void);
 	// TODO: add your methods here.
 };

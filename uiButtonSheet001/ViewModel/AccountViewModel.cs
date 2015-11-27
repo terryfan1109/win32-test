@@ -7,9 +7,13 @@ namespace uiButtonSheet001.ViewModel
 {
   public interface AccountViewModel: System.ComponentModel.INotifyPropertyChanged
   {
-    IEnumerable<AccountEntity> accounts { get; }
+    List<AccountEntity> accounts { get; }
 
     void addAccont();
-    void removeAccount(String account);
+    void removeAccount(AccountEntity account);
+    void execute(object sender, object argument);
+
+    Command addAccountCommand { get; }
+    Command removeAccountCommand { get; }
   }
 }

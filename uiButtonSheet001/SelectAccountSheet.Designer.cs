@@ -37,7 +37,7 @@
       // 
       // button1
       // 
-      this.button1.Location = new System.Drawing.Point(2, 327);
+      this.button1.Location = new System.Drawing.Point(2, 364);
       this.button1.Name = "button1";
       this.button1.Size = new System.Drawing.Size(95, 53);
       this.button1.TabIndex = 0;
@@ -47,16 +47,17 @@
       // 
       // flowLayoutPanel1
       // 
-      this.flowLayoutPanel1.Location = new System.Drawing.Point(2, 76);
+      this.flowLayoutPanel1.AutoScroll = true;
+      this.flowLayoutPanel1.Location = new System.Drawing.Point(15, 76);
       this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
       this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-      this.flowLayoutPanel1.Size = new System.Drawing.Size(280, 234);
+      this.flowLayoutPanel1.Size = new System.Drawing.Size(252, 265);
       this.flowLayoutPanel1.TabIndex = 1;
       this.flowLayoutPanel1.Paint += new System.Windows.Forms.PaintEventHandler(this.flowLayoutPanel1_Paint);
       // 
       // button2
       // 
-      this.button2.Location = new System.Drawing.Point(102, 327);
+      this.button2.Location = new System.Drawing.Point(102, 364);
       this.button2.Name = "button2";
       this.button2.Size = new System.Drawing.Size(95, 53);
       this.button2.TabIndex = 2;
@@ -66,7 +67,7 @@
       // 
       // button3
       // 
-      this.button3.Location = new System.Drawing.Point(202, 327);
+      this.button3.Location = new System.Drawing.Point(202, 364);
       this.button3.Name = "button3";
       this.button3.Size = new System.Drawing.Size(80, 53);
       this.button3.TabIndex = 3;
@@ -80,15 +81,15 @@
       this.label1.Font = new System.Drawing.Font("PMingLiU", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
       this.label1.Location = new System.Drawing.Point(83, 30);
       this.label1.Name = "label1";
-      this.label1.Size = new System.Drawing.Size(119, 19);
+      this.label1.Size = new System.Drawing.Size(120, 19);
       this.label1.TabIndex = 4;
-      this.label1.Text = "Select Account";
+      this.label1.Text = "Chose Account";
       // 
       // SelectAccountSheet
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(284, 382);
+      this.ClientSize = new System.Drawing.Size(285, 420);
       this.ControlBox = false;
       this.Controls.Add(this.label1);
       this.Controls.Add(this.button3);

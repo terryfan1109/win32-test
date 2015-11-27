@@ -35,7 +35,7 @@
       // 
       // button1
       // 
-      this.button1.Location = new System.Drawing.Point(2, 327);
+      this.button1.Location = new System.Drawing.Point(1, 364);
       this.button1.Name = "button1";
       this.button1.Size = new System.Drawing.Size(281, 53);
       this.button1.TabIndex = 0;
@@ -45,10 +45,11 @@
       // 
       // flowLayoutPanel1
       // 
-      this.flowLayoutPanel1.Location = new System.Drawing.Point(2, 74);
+      this.flowLayoutPanel1.AutoScroll = true;
+      this.flowLayoutPanel1.Location = new System.Drawing.Point(15, 76);
       this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
       this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-      this.flowLayoutPanel1.Size = new System.Drawing.Size(280, 234);
+      this.flowLayoutPanel1.Size = new System.Drawing.Size(252, 265);
       this.flowLayoutPanel1.TabIndex = 2;
       // 
       // label1
@@ -65,7 +66,7 @@
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(284, 382);
+      this.ClientSize = new System.Drawing.Size(285, 420);
       this.ControlBox = false;
       this.Controls.Add(this.label1);
       this.Controls.Add(this.flowLayoutPanel1);

@@ -16,6 +16,9 @@ namespace appDir001
       {
         Directory.CreateDirectory(appFolder);
       }
+
+      var url = new Uri(new Uri("https://profile.htcsense.com/SS/WS/"), "/profile/service/uri");
+      System.Diagnostics.Trace.WriteLine(url.ToString());
     }
   }
 }
